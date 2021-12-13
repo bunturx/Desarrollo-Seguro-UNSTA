@@ -2,7 +2,7 @@
   <a href="https://www.unsta.edu.ar/ingenieria/diplomatura-en-desarrollo-seguro-de-aplicaciones/">
     <img
       alt="Unsta"
-      src="https://www.unsta.edu.ar/ingenieria/wp-content/uploads/sites/8/2018/05/Isologotipos_fac_Ingenieria_UNSTA-09.png"
+      src="https://www.unsta.edu.ar/wp-content/uploads/2020/08/Universidad_Del_norte_Santo_tomas_de_aquino_UNSTA.jpg"
       width="400"
       style="background:#2b4e84"
     />
