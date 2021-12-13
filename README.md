@@ -4,7 +4,7 @@
       alt="Unsta"
       src="https://www.unsta.edu.ar/ingenieria/wp-content/uploads/sites/8/2018/05/Isologotipos_fac_Ingenieria_UNSTA-09.png"
       width="400"
-      style="background:#2b4e84"
+      style="background:black"
     />
   </a>
 </p>
