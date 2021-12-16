@@ -71,16 +71,13 @@ GET
 Response:
 ```
 
- {
-        "id": 1,
-        "title": "Curso de Formacion Numero 1",
-        "url": "https://example.com/course/1"
-    },
-    {
-        "id": 2,
-        "title": "Curso de Formacion Numero 2",
-        "url": "https://example.com/course/2"
-    }
+{
+    "nombre": "Ejemplo 2",
+    "codigo": "22222",
+    "descripcion": "Descripcion ejemplo 2",
+    "url": "www.ejemplo.com"
+
+}
 
 ```
 
@@ -92,8 +89,9 @@ POST
 Se necesita cargar el body con los datos del nuevo curso a agregar:
 ```
 {
-    "id": "3",
-    "title": "Curso de Formacion 3",
+    "nombre": "Curso de ejemplo 2",
+    "codigo": "22222",
+    "descripcion": "Descripcion ejemplo 2",
     "url": "www.ejemplo.com"
 
 }

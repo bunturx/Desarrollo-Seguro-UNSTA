@@ -1,29 +1,27 @@
+require('./models/db');
 const express = require('express')
+const mongoose = require('mongoose');
+const Course = mongoose.model('Course');
+const User = mongoose.model('User');
 const jwt = require('jsonwebtoken')
 const cors = require('cors')
 const server = express()
 server.use(express.json())
 server.use(cors())
 
+
 const myPassJWT = 'my_secret_password'
+var courses = new Course();
 
-const users = [
-    {user: 'pepe', pass: '1234'},
-    {user: 'carlos', pass: '12345'}
-]
+//Agregar nuevo user en la BBDD
+var user = new User({
+    username: 'pepe',
+    password: '12345'
+});
 
-let courses = [
-    {
-        id: 1,
-        title: 'Curso de Formacion Numero 1',
-        url: 'https://example.com/course/1'
-    },
-    {
-        id: 2,
-        title: 'Curso de Formacion Numero 2',
-        url: 'https://example.com/course/2'
-    }
-];
+user.save(function (err, results) {
+    console.log(results._id);
+});
 
 const validateUser = (request, response, next) => {
     let token = request.headers.authorization;
@@ -41,20 +39,18 @@ const validateUser = (request, response, next) => {
 }
 
 server.post('/login', (request, response) => {
-    let {user, pass} = (request.body);
-    users.forEach((data) => {
-        if(data.user == user && data.pass == pass){
-            let token = jwt.sign(data, myPassJWT);
-            response.status(200).json({token: token})
-        }
-    });
-    response.status(401).json({msj: 'Invalid Login'})
+    let {username, password} = (request.body);
+    // valido si lo que viene por request es igual a la BBDD
+    if(user.username == username && user.password == password){
+        let token = jwt.sign(user.toObject(), myPassJWT);
+        response.status(200).json({token: token})
+    }
+    response.status(401).json({msj: 'Login Invalido'})
  });
 
 
-// Acceso publico sin JWT
 server.get('/public', (req, res) => {
-    res.json({msj: 'Acceso publico sin JWT...'})
+    res.json({msj: `Resultados de los usuarios en la BBDD: ${user}`})
 });
 
 // GET privado para probar JWT
@@ -64,20 +60,39 @@ server.get('/private', validateUser, (request, response) => {
 
 // GET que Obtiene el total de cursos de formación
 server.get('/course', validateUser,(req, res) => {
-    res.send(courses);
+    Course.find((err, docs) => {
+        if (!err) {
+            res.json(docs);
+        }
+        else {
+            console.log('Error al mostrar cursos:' + err);
+        }
+    });
+    
 });
 
 // GET que retorna un curso especifico
-server.get('/course/:indexCourse', validateUser,(req, res) => {
-    const indexCourse = req.params.indexCourse-1;
-    res.json(courses[indexCourse] || 'Curso Incorrecto');
+server.get('/course/:codigoCurso', validateUser,(req, res) => {
+    const codigoCurso = req.params.codigoCurso;
+    Course.findOne({codigoCurso : { $eq: referenceNumber }}, (err, doc) => {
+        if (!err) {
+            res.json(doc[referenceNumber] || 'Curso Incorrecto');
+        } 
+        else {
+            res.json('Error al mostrar el curso:' + req.params.codigoCurso);
+        }
+    });
 });
 
 // POST
 // Agrega un nuevo curso pasandole en el body los valores
 // similar al array "courses"
 server.post("/course", validateUser,(req, res) =>{
-    courses.push(req.body);
+    courses.courseName = req.body.nombre;
+    courses.referenceNumber = req.body.codigo;
+    courses.description = req.body.descripcion;
+    courses.url = req.body.url;
+    courses.save(req.body);
     res.json("Nuevo curso agregado correctamente...");
 });
 
@@ -85,15 +100,22 @@ server.post("/course", validateUser,(req, res) =>{
 // Elimina un curso pasandole su id
 server.delete("/course/:id", validateUser, (req, res) =>{
     const index = req.params.id;
-    courses.splice(index, 1);
+    courses.deleteOne(index, 1);
     res.json("Curso: " + index + " eliminado...");
+
+    Course.findByIdAndRemove(req.params.id, (err, doc) => {
+        if (!err) {
+            res.redirect('/course/list');
+        }
+        else { console.log('Error in course delete :' + err); }
+    });
 });
 
 // PUT
-// Agrega un nuevo curso
+// Actualiza un nuevo curso
 server.put("/course/:id", (req,res) =>{
     const index = req.params.id;
-    courses.splice(index, 1, req.body);
+    courses.save(index, 1, req.body);
     res.json("Actualizado curso: "+ index);
 });
 
